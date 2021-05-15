@@ -1,0 +1,60 @@
+openapi: 3.0.3
+info:
+  title: WriterXL API
+  description: >
+    WriterXL is a collection of online tools to help writers and writing groups.
+  version: 1.0.0
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: 'https://api.writerxl.com'
+
+paths:
+  # User Accounts
+  /user:
+    post:
+      summary: Create user.
+      operationId: createUser
+      tags:
+        - User Accounts
+      requestBody:
+        description: The user to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        201:
+          description: User was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: The submitted user is invalid.
+
+        409:
+          description: The requested user already exists.
+
+components:
+  schemas:
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        status:
+          type: string
+          enum: [ ACTIVE, INACTIVE ]
+      required:
+        - email
+        - status

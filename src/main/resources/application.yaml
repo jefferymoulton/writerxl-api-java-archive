@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      host: ${DB_HOST}
+      port: ${DB_PORT}
+      database: ${DB_NAME}
+      auto-index-creation: true
+
+logging:
+  level:
+    org:
+      springframework:
+        data: debug
