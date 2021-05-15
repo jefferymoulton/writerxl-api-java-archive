@@ -18,6 +18,11 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
-        return ResponseEntity.ok(userService.createUser(user));
+        try {
+            return ResponseEntity.ok(userService.createUser(user));
+        }
+        catch (DuplicateKeyException ex) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "The user account already exists.", ex);
+        }
     }
 }
