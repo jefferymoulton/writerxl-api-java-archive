@@ -9,18 +9,21 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class Profile {
+    private String key;
     private String firstName;
     private String lastName;
     private String email;
-    private UserStatus status;
+    private ProfileStatus status;
 
     private LocalDateTime memberSince;
 
-    public User(String firstName,
-                String lastname,
-                String email,
-                UserStatus status) {
+    public Profile(String key,
+                   String firstName,
+                   String lastname,
+                   String email,
+                   ProfileStatus status) {
+        this.key = key;
         this.firstName = firstName;
         this.lastName = lastname;
         this.email = email;

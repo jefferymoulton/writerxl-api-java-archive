@@ -1,6 +1,6 @@
 package com.writerxl.api.model;
 
-public enum UserStatus {
+public enum ProfileStatus {
     ACTIVE,
     INACTIVE,
     DELETED

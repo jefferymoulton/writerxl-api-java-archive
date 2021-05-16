@@ -1,6 +1,6 @@
 package com.writerxl.api.data.entity;
 
-import com.writerxl.api.model.UserStatus;
+import com.writerxl.api.model.ProfileStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,11 +16,14 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "users")
-public class MongoUserEntity {
+@Document(collection = "profiles")
+public class MongoProfileEntity {
 
     @Id
     private ObjectId id;
+
+    @Indexed(unique = true)
+    private String key;
 
     private String firstName;
     private String lastName;
@@ -28,7 +31,7 @@ public class MongoUserEntity {
     @Indexed(unique = true)
     private String email;
 
-    private UserStatus status;
+    private ProfileStatus status;
 
     @DateTimeFormat(style = "M-")
     @CreatedDate
