@@ -33,5 +33,4 @@ public class MongoUserEntity {
     @DateTimeFormat(style = "M-")
     @CreatedDate
     private LocalDateTime memberSince;
-
 }
