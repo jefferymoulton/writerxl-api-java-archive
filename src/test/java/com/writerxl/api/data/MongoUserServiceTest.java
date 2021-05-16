@@ -1,5 +1,6 @@
 package com.writerxl.api.data;
 
+import com.writerxl.api.UserNotFoundException;
 import com.writerxl.api.data.entity.MongoUserEntity;
 import com.writerxl.api.data.mapper.MongoUserEntityMapper;
 import com.writerxl.api.data.mapper.MongoUserEntityMapperImpl;
@@ -17,8 +18,10 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +34,8 @@ class MongoUserServiceTest {
     private final String MOCK_VALID_LAST_NAME = "User";
     private final String MOCK_VALID_EMAIL = "valid@email.com";
     private final LocalDateTime MOCK_DATE_TIME = LocalDateTime.now();
+
+    private final String MOCK_INVALID_EMAIL = "invalid@email.com";
 
     private MongoUserService userService;
 
@@ -67,12 +72,7 @@ class MongoUserServiceTest {
                 .thenReturn(validUserEntity);
 
         User createdUser = userService.createUser(validUserRequest);
-
-        assertEquals(MOCK_VALID_FIRST_NAME, createdUser.getFirstName());
-        assertEquals(MOCK_VALID_LAST_NAME, createdUser.getLastName());
-        assertEquals(MOCK_VALID_EMAIL, createdUser.getEmail());
-        assertEquals(UserStatus.ACTIVE, createdUser.getStatus());
-        assertEquals(MOCK_DATE_TIME, createdUser.getMemberSince());
+        testValidUser(createdUser);
     }
 
     @Test
@@ -85,5 +85,33 @@ class MongoUserServiceTest {
         Exception ex = assertThrows(DuplicateKeyException.class, () -> userService.createUser(validUserRequest));
 
         assertEquals(duplicateErrorMsg, ex.getMessage());
+    }
+
+    @Test
+    void testGetUserByValidEmail() {
+        when(mockUserRepository.findOneByEmail(MOCK_VALID_EMAIL)).thenReturn(Optional.of(validUserEntity));
+
+        User foundUser = userService.getUserByEmail(MOCK_VALID_EMAIL);
+        testValidUser(foundUser);
+    }
+
+    @Test
+    void testGetUserByInvalidEmail() {
+        String userAccountNotFound = "Unable to find specified user.";
+
+        when(mockUserRepository.findOneByEmail(MOCK_INVALID_EMAIL))
+                .thenThrow(new UserNotFoundException(userAccountNotFound));
+
+        Exception ex = assertThrows(UserNotFoundException.class, () -> userService.getUserByEmail(MOCK_INVALID_EMAIL));
+
+        assertEquals(userAccountNotFound, ex.getMessage());
+    }
+
+    void testValidUser(User userToTest) {
+        assertEquals(MOCK_VALID_FIRST_NAME, userToTest.getFirstName());
+        assertEquals(MOCK_VALID_LAST_NAME, userToTest.getLastName());
+        assertEquals(MOCK_VALID_EMAIL, userToTest.getEmail());
+        assertEquals(UserStatus.ACTIVE, userToTest.getStatus());
+        assertEquals(MOCK_DATE_TIME, userToTest.getMemberSince());
     }
 }

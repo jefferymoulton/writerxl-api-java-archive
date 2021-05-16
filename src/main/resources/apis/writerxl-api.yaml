@@ -38,6 +38,29 @@ paths:
         409:
           description: The requested user already exists.
 
+  /user/{email}:
+    get:
+      summary: Get a user by email address.
+      operationId: getUserByEmail
+      tags:
+        - User Accounts
+      parameters:
+        - name: email
+          in: path
+          description: Account email address.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Account found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: Account not found.
+
 components:
   schemas:
 
