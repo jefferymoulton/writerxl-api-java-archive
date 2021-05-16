@@ -13,11 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
@@ -39,6 +40,13 @@ class MongoUserServiceTest {
     @Mock
     private MongoUserRepository mockUserRepository;
 
+    private final User validUserRequest = new User(
+            MOCK_VALID_FIRST_NAME,
+            MOCK_VALID_LAST_NAME,
+            MOCK_VALID_EMAIL,
+            UserStatus.ACTIVE
+    );
+
     private final MongoUserEntity validUserEntity = new MongoUserEntity(
             MOCK_USER_ID,
             MOCK_VALID_FIRST_NAME,
@@ -54,15 +62,10 @@ class MongoUserServiceTest {
     }
 
     @Test
-    void testValidUserCreated() {
-        User validUserRequest = new User(
-                MOCK_VALID_FIRST_NAME,
-                MOCK_VALID_LAST_NAME,
-                MOCK_VALID_EMAIL,
-                UserStatus.ACTIVE
-        );
+    void testValidUserCreation() {
+        when(mockUserRepository.save(any(MongoUserEntity.class)))
+                .thenReturn(validUserEntity);
 
-        when(mockUserRepository.save(any(MongoUserEntity.class))).thenReturn(validUserEntity);
         User createdUser = userService.createUser(validUserRequest);
 
         assertEquals(MOCK_VALID_FIRST_NAME, createdUser.getFirstName());
@@ -70,5 +73,17 @@ class MongoUserServiceTest {
         assertEquals(MOCK_VALID_EMAIL, createdUser.getEmail());
         assertEquals(UserStatus.ACTIVE, createdUser.getStatus());
         assertEquals(MOCK_DATE_TIME, createdUser.getMemberSince());
+    }
+
+    @Test
+    void testDuplicateUserCreation() {
+        String duplicateErrorMsg = "The user account already exists.";
+
+        when(mockUserRepository.save(any(MongoUserEntity.class)))
+                .thenThrow(new DuplicateKeyException(duplicateErrorMsg));
+
+        Exception ex = assertThrows(DuplicateKeyException.class, () -> userService.createUser(validUserRequest));
+
+        assertEquals(duplicateErrorMsg, ex.getMessage());
     }
 }
