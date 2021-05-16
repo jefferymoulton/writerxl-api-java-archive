@@ -34,15 +34,4 @@ public class MongoUserEntity {
     @CreatedDate
     private LocalDateTime memberSince;
 
-    public MongoUserEntity(ObjectId id,
-                           String firstName,
-                           String lastName,
-                           String email,
-                           UserStatus status) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.status = status;
-    }
 }
